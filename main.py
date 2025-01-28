@@ -58,10 +58,11 @@ def run():
     invalid_dashboards = []
     # v = Schema(json.load(open('config_schema.json', 'r')))
     config = build_module_list_from_config(module_names, modules)
+    datasource_mapping = construct_datasource_mapping()
     logging.getLogger(__name__).setLevel(level=get_log_level_descriptor(config.get('log_level')))
 
     import_dashboards(dashboards, modules[0])
-    converter = InfluxQLToM3DashboardConverter(replacement_datasource=config.get('datasource'),
+    converter = InfluxQLToM3DashboardConverter(datasource_map=datasource_mapping,
                                                log_level=get_log_level_descriptor(config.get('log_level')))
     influx_dashboards = []
     convert_dashboards(converter, dashboards, influx_dashboards, invalid_dashboards)
@@ -92,6 +93,39 @@ def build_module_list_from_config(module_names, modules) -> dict:
                         logger.error(f"Error validating config for module: {module} with error: {str(e)}, skipping")
     return config
 
+
+def construct_datasource_mapping() -> Optional[Dict[str, str]]:
+    """
+    Reads JSON data and constructs a mapping of 'uid' from InfluxDB to Mimir datasources based on their names.
+
+    :param json_data: JSON string containing an array of objects with 'uid', 'name', and 'type'.
+    :return: A dictionary mapping 'InfluxDB' uids to 'Mimir' uids based on matching names suffix, or None if input is invalid.
+    """
+    try:
+
+        with open("tt_datasources.json", 'r') as stream:
+            # Parse the JSON string
+            data = json.load(stream)
+
+        # Ensure data is a list of dictionaries
+        if not isinstance(data, list):
+            raise ValueError("JSON data is not a list.")
+
+        # Separate the entries by type
+        influx_entries = {item["name"]: item["uid"] for item in data if item.get("type") == "influxdb"}
+        mimir_entries = {item["name"]: item["uid"] for item in data if item.get("type") == "prometheus"}
+
+        # Match by suffix of the names (i.e., using endswith)
+        mapping = {}
+        for influx_name, influx_uid in influx_entries.items():
+            for mimir_name, mimir_uid in mimir_entries.items():
+                if mimir_name.endswith(influx_name.split(" ")[-1]):  # Compare suffixes
+                    mapping[influx_uid] = mimir_uid
+
+        return mapping if mapping else None
+    except (json.JSONDecodeError, ValueError, KeyError) as e:
+        print(f"Error processing JSON: {e}")
+        return None
 
 def import_dashboards(dashboards, inputs):
     for input in inputs:
