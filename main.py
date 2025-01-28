@@ -74,7 +74,7 @@ def run():
 
 
 def build_module_list_from_config(module_names, modules) -> dict:
-    with open("config.yaml", 'r') as stream:
+    with open("config_local.yaml", 'r') as stream:
         config = yaml.safe_load(stream)
         # v.validate(config)
         for index in range(0, 3):
