@@ -1,0 +1,1822 @@
+[
+  {
+    "uid": "fdiiqejlnfawwa",
+    "name": "Elasticsearch",
+    "type": "elasticsearch"
+  },
+  {
+    "uid": "EjzOw51Mz",
+    "name": "InfluxDB",
+    "type": "influxdb"
+  },
+  {
+    "uid": "RyNi7e0Vk",
+    "name": "InfluxDB aakarshsvc",
+    "type": "influxdb"
+  },
+  {
+    "uid": "k_PIMZUnk",
+    "name": "InfluxDB admin_gateway",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ArJjvK0Vz",
+    "name": "InfluxDB admin_ui",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000014",
+    "name": "InfluxDB agonas",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000011",
+    "name": "InfluxDB airflow",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000068",
+    "name": "InfluxDB alerting",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000111",
+    "name": "InfluxDB alfred_http",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000046",
+    "name": "InfluxDB annotations",
+    "type": "influxdb"
+  },
+  {
+    "uid": "n4ofz7mVk",
+    "name": "InfluxDB authorizations",
+    "type": "influxdb"
+  },
+  {
+    "uid": "F0Ssi9SVz",
+    "name": "InfluxDB authz",
+    "type": "influxdb"
+  },
+  {
+    "uid": "fdsyb5jj0vjeof",
+    "name": "InfluxDB autocomplete_1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cYIQpNm4k",
+    "name": "InfluxDB badbotblocker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000033",
+    "name": "InfluxDB becquerel",
+    "type": "influxdb"
+  },
+  {
+    "uid": "adjuha1n6jh8ga",
+    "name": "InfluxDB bedrock_cron",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000056",
+    "name": "InfluxDB bizmetrics",
+    "type": "influxdb"
+  },
+  {
+    "uid": "3u6IK93Vk",
+    "name": "InfluxDB boya202307",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ehOSFvJ4k",
+    "name": "InfluxDB boya_8",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000105",
+    "name": "InfluxDB browse",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000072",
+    "name": "InfluxDB budget",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000043",
+    "name": "InfluxDB bufferson",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000067",
+    "name": "InfluxDB bufferson_rcvr",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000066",
+    "name": "InfluxDB bufferson_rpl",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000108",
+    "name": "InfluxDB business",
+    "type": "influxdb"
+  },
+  {
+    "uid": "DADYJm1Ik",
+    "name": "InfluxDB cache_warmup",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000041",
+    "name": "InfluxDB callbacks",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000040",
+    "name": "InfluxDB calltracking",
+    "type": "influxdb"
+  },
+  {
+    "uid": "3UQiUvJGz",
+    "name": "InfluxDB cancelcontbgc",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000076",
+    "name": "InfluxDB channel",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000008",
+    "name": "InfluxDB cloudwatch",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000099",
+    "name": "InfluxDB cloudwatchlogs",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000074",
+    "name": "InfluxDB cms_publisher",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000075",
+    "name": "InfluxDB cobalt",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000077",
+    "name": "InfluxDB comms",
+    "type": "influxdb"
+  },
+  {
+    "uid": "hiVqzr_Gz",
+    "name": "InfluxDB communications",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ZE_4p_2Gk",
+    "name": "InfluxDB configexpirechk",
+    "type": "influxdb"
+  },
+  {
+    "uid": "W0tvKHFSk",
+    "name": "InfluxDB controlcenter",
+    "type": "influxdb"
+  },
+  {
+    "uid": "BZzvnIuGz",
+    "name": "InfluxDB credentials",
+    "type": "influxdb"
+  },
+  {
+    "uid": "S3F9qyBVz",
+    "name": "InfluxDB crm_slot_sync",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000006",
+    "name": "InfluxDB cryotube",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000096",
+    "name": "InfluxDB customerinfo",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ZVXv2R7nk",
+    "name": "InfluxDB customerinfowkr",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000094",
+    "name": "InfluxDB delayedpricing",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000031",
+    "name": "InfluxDB delivery",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000069",
+    "name": "InfluxDB deliveryrpc",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000070",
+    "name": "InfluxDB deliveryworker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000052",
+    "name": "InfluxDB deploy",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bUsp_xKGk",
+    "name": "InfluxDB deploy_ui",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000063",
+    "name": "InfluxDB dibileaks",
+    "type": "influxdb"
+  },
+  {
+    "uid": "B6Yjifx7z",
+    "name": "InfluxDB discounts",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdxiw6iy7lfcwd",
+    "name": "InfluxDB dpc_1h_type",
+    "type": "influxdb"
+  },
+  {
+    "uid": "H8OVu7xSk",
+    "name": "InfluxDB dpc_24h",
+    "type": "influxdb"
+  },
+  {
+    "uid": "j-g_5PJIk",
+    "name": "InfluxDB dpc_8h",
+    "type": "influxdb"
+  },
+  {
+    "uid": "DLNC97bSz",
+    "name": "InfluxDB dpc_8h_1h111",
+    "type": "influxdb"
+  },
+  {
+    "uid": "QENjr7bIz",
+    "name": "InfluxDB dpc_8h_1t111",
+    "type": "influxdb"
+  },
+  {
+    "uid": "eyHj9nxIz",
+    "name": "InfluxDB dpc_8h_noac",
+    "type": "influxdb"
+  },
+  {
+    "uid": "nt7RGqJIk",
+    "name": "InfluxDB dpc_8h_noacppr",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdw9boxnjwr28a",
+    "name": "InfluxDB dpc_rank_1h111",
+    "type": "influxdb"
+  },
+  {
+    "uid": "jkAHLa1Ik",
+    "name": "InfluxDB dpcontact001",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000090",
+    "name": "InfluxDB dynamodb_sync",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000112",
+    "name": "InfluxDB empathycredit",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000085",
+    "name": "InfluxDB empathycredits",
+    "type": "influxdb"
+  },
+  {
+    "uid": "be6tewyyojr40e",
+    "name": "InfluxDB ert_pcontact",
+    "type": "influxdb"
+  },
+  {
+    "uid": "fe6thl7rdqjuof",
+    "name": "InfluxDB ert_revenue",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000032",
+    "name": "InfluxDB experiment_web",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000057",
+    "name": "InfluxDB experiments_web",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ee0h9rjfrzv9ce",
+    "name": "InfluxDB express_prompt",
+    "type": "influxdb"
+  },
+  {
+    "uid": "vg4v_SSIz",
+    "name": "InfluxDB feat_sel_v4",
+    "type": "influxdb"
+  },
+  {
+    "uid": "8YDbLTcSk",
+    "name": "InfluxDB feat_sel_v5",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000084",
+    "name": "InfluxDB featureflags",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000054",
+    "name": "InfluxDB feeds",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000080",
+    "name": "InfluxDB feedsworker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000015",
+    "name": "InfluxDB fides",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000091",
+    "name": "InfluxDB fidesworker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "M02zRnOIz",
+    "name": "InfluxDB fishfood",
+    "type": "influxdb"
+  },
+  {
+    "uid": "vNILwBjnz",
+    "name": "InfluxDB flagexpiry",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000026",
+    "name": "InfluxDB fluentd_events",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000101",
+    "name": "InfluxDB frontend_client",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000037",
+    "name": "InfluxDB frontend_services",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000021",
+    "name": "InfluxDB fujimoto",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000039",
+    "name": "InfluxDB glenttt",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000104",
+    "name": "InfluxDB gobort",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000035",
+    "name": "InfluxDB graph",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000017",
+    "name": "InfluxDB gringotts",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000042",
+    "name": "InfluxDB hercule",
+    "type": "influxdb"
+  },
+  {
+    "uid": "sPmZ323Vk",
+    "name": "InfluxDB hgrecssync",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ddu890s345fy8a",
+    "name": "InfluxDB home_inspection",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cJuA8Sj7z",
+    "name": "InfluxDB homeguidance",
+    "type": "influxdb"
+  },
+  {
+    "uid": "3EAoJ7U7z",
+    "name": "InfluxDB homeprofile",
+    "type": "influxdb"
+  },
+  {
+    "uid": "be6g3vka3xdz4d",
+    "name": "InfluxDB hprof_jdv3_rev",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000082",
+    "name": "InfluxDB ichabod",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000083",
+    "name": "InfluxDB ichabod_task",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000044",
+    "name": "InfluxDB images",
+    "type": "influxdb"
+  },
+  {
+    "uid": "jzBDlCy7z",
+    "name": "InfluxDB incentives",
+    "type": "influxdb"
+  },
+  {
+    "uid": "Xz2FLgE7z",
+    "name": "InfluxDB inference",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000050",
+    "name": "InfluxDB influxdb",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000060",
+    "name": "InfluxDB inter_link_cron",
+    "type": "influxdb"
+  },
+  {
+    "uid": "be1kw5ya6iz28e",
+    "name": "InfluxDB jdv3_noac",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ee1kyu7oqbsowf",
+    "name": "InfluxDB jdv3_noac_cw",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000059",
+    "name": "InfluxDB jenkins",
+    "type": "influxdb"
+  },
+  {
+    "uid": "QRVRs0tIz",
+    "name": "InfluxDB job_cost_est",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000106",
+    "name": "InfluxDB jobs",
+    "type": "influxdb"
+  },
+  {
+    "uid": "de3997jhvf30ga",
+    "name": "InfluxDB jobs_v3_rev",
+    "type": "influxdb"
+  },
+  {
+    "uid": "NENcw51Gz",
+    "name": "InfluxDB kafka",
+    "type": "influxdb"
+  },
+  {
+    "uid": "edmevr00nxo8wd",
+    "name": "InfluxDB kafka_connect",
+    "type": "influxdb"
+  },
+  {
+    "uid": "FKOdMK1Sk",
+    "name": "InfluxDB kafka_http",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ee4gleozdoj5sd",
+    "name": "InfluxDB kafkaproxy",
+    "type": "influxdb"
+  },
+  {
+    "uid": "_wl1_Z87z",
+    "name": "InfluxDB kafkascheduler",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000038",
+    "name": "InfluxDB kapacitor",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000010",
+    "name": "InfluxDB kiki",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000073",
+    "name": "InfluxDB klaxon",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000064",
+    "name": "InfluxDB kreplay",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000110",
+    "name": "InfluxDB lads",
+    "type": "influxdb"
+  },
+  {
+    "uid": "y4YdzQ4nk",
+    "name": "InfluxDB licenseexpiry",
+    "type": "influxdb"
+  },
+  {
+    "uid": "-jyfaVInz",
+    "name": "InfluxDB licensenearexp",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000089",
+    "name": "InfluxDB lighthouse",
+    "type": "influxdb"
+  },
+  {
+    "uid": "uHGoRm9Vk",
+    "name": "InfluxDB locations",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000114",
+    "name": "InfluxDB m10nworker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "u6FSdMjGk",
+    "name": "InfluxDB maintenanceplan",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000024",
+    "name": "InfluxDB matchbox",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000016",
+    "name": "InfluxDB matchbox_web",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ZrnAE0GIk",
+    "name": "InfluxDB mc_dcn_jdf",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000020",
+    "name": "InfluxDB messaging",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ddv13dg6h60aoc",
+    "name": "InfluxDB ml_se_weights",
+    "type": "influxdb"
+  },
+  {
+    "uid": "de6u0bgdw6tq8f",
+    "name": "InfluxDB mm_two_tower",
+    "type": "influxdb"
+  },
+  {
+    "uid": "de7ewbkjbqneof",
+    "name": "InfluxDB mmmw24_llmatch",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000078",
+    "name": "InfluxDB monetization",
+    "type": "influxdb"
+  },
+  {
+    "uid": "97H8Kp5Sk",
+    "name": "InfluxDB mts_ca_openai",
+    "type": "influxdb"
+  },
+  {
+    "uid": "o4Ld3J1Sz",
+    "name": "InfluxDB mts_cr_openai",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ae2n117hltvy8b",
+    "name": "InfluxDB multimod_search",
+    "type": "influxdb"
+  },
+  {
+    "uid": "TMzz4FuGz",
+    "name": "InfluxDB negotiation",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000081",
+    "name": "InfluxDB newscast",
+    "type": "influxdb"
+  },
+  {
+    "uid": "fpG5Ywf7z",
+    "name": "InfluxDB nextbestaction",
+    "type": "influxdb"
+  },
+  {
+    "uid": "dds2kfl0b1ipse",
+    "name": "InfluxDB nn_feat_eng_24",
+    "type": "influxdb"
+  },
+  {
+    "uid": "6PmTZf7Sk",
+    "name": "InfluxDB onboarding",
+    "type": "influxdb"
+  },
+  {
+    "uid": "de3ufwx8c0glcf",
+    "name": "InfluxDB ondemand",
+    "type": "influxdb"
+  },
+  {
+    "uid": "iDI30L77k",
+    "name": "InfluxDB ondemandclaim",
+    "type": "influxdb"
+  },
+  {
+    "uid": "oHhxDWDVk",
+    "name": "InfluxDB oracle",
+    "type": "influxdb"
+  },
+  {
+    "uid": "JVPyxfB4k",
+    "name": "InfluxDB otel_collector",
+    "type": "influxdb"
+  },
+  {
+    "uid": "h2f2BfBVk",
+    "name": "InfluxDB otelcollector",
+    "type": "influxdb"
+  },
+  {
+    "uid": "HUEy6eGIk",
+    "name": "InfluxDB p_contact_dcn",
+    "type": "influxdb"
+  },
+  {
+    "uid": "osPs6eMIz",
+    "name": "InfluxDB p_contact_mc",
+    "type": "influxdb"
+  },
+  {
+    "uid": "USneOtenk",
+    "name": "InfluxDB p_pro_contact",
+    "type": "influxdb"
+  },
+  {
+    "uid": "t1a9Rf_nz",
+    "name": "InfluxDB p_pro_response",
+    "type": "influxdb"
+  },
+  {
+    "uid": "2mLC-nV7k",
+    "name": "InfluxDB payworker",
+    "type": "influxdb"
+  },
+  {
+    "uid": "GUit9UkIk",
+    "name": "InfluxDB pc_multi_class",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdruzgnk7aepsb",
+    "name": "InfluxDB pfremediation",
+    "type": "influxdb"
+  },
+  {
+    "uid": "4ghtL-pSk",
+    "name": "InfluxDB pg_collector",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdmboo940nytca",
+    "name": "InfluxDB pgbouncer",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdj8jt6u5ckjke",
+    "name": "InfluxDB phpmetrics",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdn6omrin0074b",
+    "name": "InfluxDB pii_analyzer_1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ce1vo7f106neoc",
+    "name": "InfluxDB pii_scrubber",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000095",
+    "name": "InfluxDB pinger",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000022",
+    "name": "InfluxDB pkgen",
+    "type": "influxdb"
+  },
+  {
+    "uid": "adl182n425p1ce",
+    "name": "InfluxDB pmtmethodssync",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000029",
+    "name": "InfluxDB pokey",
+    "type": "influxdb"
+  },
+  {
+    "uid": "D570ZKASz",
+    "name": "InfluxDB pos_bias_24",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000092",
+    "name": "InfluxDB prediction",
+    "type": "influxdb"
+  },
+  {
+    "uid": "SZSFbCI7z",
+    "name": "InfluxDB pricing",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000051",
+    "name": "InfluxDB pro_api",
+    "type": "influxdb"
+  },
+  {
+    "uid": "5-IuxAvnk",
+    "name": "InfluxDB pro_auth",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000100",
+    "name": "InfluxDB profilereview",
+    "type": "influxdb"
+  },
+  {
+    "uid": "-POksDKnk",
+    "name": "InfluxDB profilesearch",
+    "type": "influxdb"
+  },
+  {
+    "uid": "k7I9esAGz",
+    "name": "InfluxDB proinsights",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000107",
+    "name": "InfluxDB projects",
+    "type": "influxdb"
+  },
+  {
+    "uid": "r1Mn8ZqMz",
+    "name": "InfluxDB proloyalty",
+    "type": "influxdb"
+  },
+  {
+    "uid": "TuyUkt2Mk",
+    "name": "InfluxDB prorecommend",
+    "type": "influxdb"
+  },
+  {
+    "uid": "PrlUkt2Gz",
+    "name": "InfluxDB prorecommendations",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000018",
+    "name": "InfluxDB prospect",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000103",
+    "name": "InfluxDB protemplates",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000019",
+    "name": "InfluxDB quoting",
+    "type": "influxdb"
+  },
+  {
+    "uid": "HUsC3AHSk",
+    "name": "InfluxDB ratio_features",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000053",
+    "name": "InfluxDB react_renderer",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000113",
+    "name": "InfluxDB recommendation",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000109",
+    "name": "InfluxDB refunds",
+    "type": "influxdb"
+  },
+  {
+    "uid": "vPLjWLDIk",
+    "name": "InfluxDB remove_bc_cb",
+    "type": "influxdb"
+  },
+  {
+    "uid": "tYYCWYDIk",
+    "name": "InfluxDB remove_bc_dcn",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000030",
+    "name": "InfluxDB requestform",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000009",
+    "name": "InfluxDB reverse_proxy",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000012",
+    "name": "InfluxDB reviews",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ce2d2fhyohds0f",
+    "name": "InfluxDB reviews_v2_24",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ddwxc3d2c2cjkf",
+    "name": "InfluxDB rm_bc_dcn_2408",
+    "type": "influxdb"
+  },
+  {
+    "uid": "8iAXv_mSz",
+    "name": "InfluxDB rollouts",
+    "type": "influxdb"
+  },
+  {
+    "uid": "be0gz27hkeyv4c",
+    "name": "InfluxDB rw_loss_0",
+    "type": "influxdb"
+  },
+  {
+    "uid": "A-ir-24Gz",
+    "name": "InfluxDB saleshydra",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000023",
+    "name": "InfluxDB satao",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000079",
+    "name": "InfluxDB schaaf",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000013",
+    "name": "InfluxDB scheduling",
+    "type": "influxdb"
+  },
+  {
+    "uid": "jZSyksDSz",
+    "name": "InfluxDB schemaregistry",
+    "type": "influxdb"
+  },
+  {
+    "uid": "fdl4cgxmd6tj4c",
+    "name": "InfluxDB search_openai",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000034",
+    "name": "InfluxDB search_updater",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000055",
+    "name": "InfluxDB search_web",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000027",
+    "name": "InfluxDB searchweb",
+    "type": "influxdb"
+  },
+  {
+    "uid": "jX6yKTgIk",
+    "name": "InfluxDB secrets",
+    "type": "influxdb"
+  },
+  {
+    "uid": "2AzftnhSk",
+    "name": "InfluxDB semantic_facet",
+    "type": "influxdb"
+  },
+  {
+    "uid": "GElSUvZIk",
+    "name": "InfluxDB semantic_gte",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdpvzq6to7x8gc",
+    "name": "InfluxDB semantic_mw24",
+    "type": "influxdb"
+  },
+  {
+    "uid": "689OGCw4k",
+    "name": "InfluxDB semantic_search",
+    "type": "influxdb"
+  },
+  {
+    "uid": "edjqwtoa600e8e",
+    "name": "InfluxDB semantic_v3",
+    "type": "influxdb"
+  },
+  {
+    "uid": "HU8oiIkIk",
+    "name": "InfluxDB semanticllm0823",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000028",
+    "name": "InfluxDB seo",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000061",
+    "name": "InfluxDB seo_lifecycle",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdjqgrlgcml1cf",
+    "name": "InfluxDB seologmetrics",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdjmawirniby8b",
+    "name": "InfluxDB seologstometrics",
+    "type": "influxdb"
+  },
+  {
+    "uid": "edlpj6dgi7g8we",
+    "name": "InfluxDB seopagespeed",
+    "type": "influxdb"
+  },
+  {
+    "uid": "k-HWP8aVk",
+    "name": "InfluxDB setltransfers",
+    "type": "influxdb"
+  },
+  {
+    "uid": "WKD5-qb7k",
+    "name": "InfluxDB showroom",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000065",
+    "name": "InfluxDB silverstripe",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000045",
+    "name": "InfluxDB simmanager",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000097",
+    "name": "InfluxDB sklearn-serving",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000098",
+    "name": "InfluxDB sklearn_serving",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdw990mncya68c",
+    "name": "InfluxDB sp_k100_no_d",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cdw9boy2eb11ca",
+    "name": "InfluxDB sp_k10_d",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ddw12n3os1logd",
+    "name": "InfluxDB sp_k5100_d",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000102",
+    "name": "InfluxDB survey",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000036",
+    "name": "InfluxDB swan",
+    "type": "influxdb"
+  },
+  {
+    "uid": "vxeS_3b7k",
+    "name": "InfluxDB synccalendars",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000115",
+    "name": "InfluxDB targeting",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000049",
+    "name": "InfluxDB telegraf",
+    "type": "influxdb"
+  },
+  {
+    "uid": "5ydOYl0Sz",
+    "name": "InfluxDB testmodel0311",
+    "type": "influxdb"
+  },
+  {
+    "uid": "cUlJfIgIz",
+    "name": "InfluxDB testmodel0501",
+    "type": "influxdb"
+  },
+  {
+    "uid": "TkkHvjeVk",
+    "name": "InfluxDB testmodel0607",
+    "type": "influxdb"
+  },
+  {
+    "uid": "m-fZyRgIk",
+    "name": "InfluxDB testmodel0609",
+    "type": "influxdb"
+  },
+  {
+    "uid": "btKkL7RSz",
+    "name": "InfluxDB testmodel0610",
+    "type": "influxdb"
+  },
+  {
+    "uid": "edq610hphvhmod",
+    "name": "InfluxDB testmodel0628_1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "DMhSkuC4k",
+    "name": "InfluxDB testmodel0719",
+    "type": "influxdb"
+  },
+  {
+    "uid": "kJMDrQqVz",
+    "name": "InfluxDB testmodel0729",
+    "type": "influxdb"
+  },
+  {
+    "uid": "JsVxlwqVk",
+    "name": "InfluxDB testmodel0730",
+    "type": "influxdb"
+  },
+  {
+    "uid": "bdunkbarxyltsb",
+    "name": "InfluxDB testmodel0812_1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "prbehzMSk",
+    "name": "InfluxDB testmodel0913",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ysJ3EgGIz",
+    "name": "InfluxDB testmodel0914",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ZXtnCJWIz",
+    "name": "InfluxDB testmodel0923",
+    "type": "influxdb"
+  },
+  {
+    "uid": "qDohXJZIz",
+    "name": "InfluxDB testmodel0924",
+    "type": "influxdb"
+  },
+  {
+    "uid": "fpGQ5WMIz",
+    "name": "InfluxDB testmodel100523",
+    "type": "influxdb"
+  },
+  {
+    "uid": "kaxssbGIz",
+    "name": "InfluxDB testmodel1011",
+    "type": "influxdb"
+  },
+  {
+    "uid": "hWZhIX84k",
+    "name": "InfluxDB testtensorflow",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000025",
+    "name": "InfluxDB tophat",
+    "type": "influxdb"
+  },
+  {
+    "uid": "de985zmhsrawwa",
+    "name": "InfluxDB torchserve_demo",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ee0h4euxa8sg0f",
+    "name": "InfluxDB tr_rw_loss_1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ce0h4ev65vsowf",
+    "name": "InfluxDB tr_rw_loss_2",
+    "type": "influxdb"
+  },
+  {
+    "uid": "ae0h737swglc0b",
+    "name": "InfluxDB tr_rw_loss_5",
+    "type": "influxdb"
+  },
+  {
+    "uid": "IuNHRwEMk",
+    "name": "InfluxDB trickle",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000093",
+    "name": "InfluxDB unviewedrefunds",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000071",
+    "name": "InfluxDB users",
+    "type": "influxdb"
+  },
+  {
+    "uid": "eds99a9nun18gc",
+    "name": "InfluxDB webhooks",
+    "type": "influxdb"
+  },
+  {
+    "uid": "000000007",
+    "name": "InfluxDB website",
+    "type": "influxdb"
+  },
+  {
+    "uid": "vjNoi6lMk",
+    "name": "InfluxDB-1",
+    "type": "influxdb"
+  },
+  {
+    "uid": "wujhG6lMk",
+    "name": "InfluxDB-2",
+    "type": "influxdb"
+  },
+  {
+    "uid": "S91oM6lGz",
+    "name": "InfluxDB-3",
+    "type": "influxdb"
+  },
+  {
+    "uid": "gEc1M6_Gk",
+    "name": "InfluxDB-4",
+    "type": "influxdb"
+  },
+  {
+    "uid": "Ml0JG6_Mk",
+    "name": "InfluxDB-5",
+    "type": "influxdb"
+  },
+  {
+    "uid": "jo9JG6_Gk",
+    "name": "InfluxDB-6",
+    "type": "influxdb"
+  },
+  {
+    "uid": "8U8_5atSz",
+    "name": "Mimir admin-gateway",
+    "type": "prometheus"
+  },
+  {
+    "uid": "P2MyynDIk",
+    "name": "Mimir admin-ui",
+    "type": "prometheus"
+  },
+  {
+    "uid": "wCWXmUbSz",
+    "name": "Mimir agonas",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ce5r7d5t9v9q8d",
+    "name": "Mimir alfred-http",
+    "type": "prometheus"
+  },
+  {
+    "uid": "de1vqvqwwcq9sf",
+    "name": "Mimir annotations",
+    "type": "prometheus"
+  },
+  {
+    "uid": "de2gs8m1yj6yoe",
+    "name": "Mimir authorizations",
+    "type": "prometheus"
+  },
+  {
+    "uid": "1rIetg2Sz",
+    "name": "Mimir authz",
+    "type": "prometheus"
+  },
+  {
+    "uid": "aX8lc-pSz",
+    "name": "Mimir badbotblocker",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddju993izs16of",
+    "name": "Mimir browse",
+    "type": "prometheus"
+  },
+  {
+    "uid": "E98lcapIk",
+    "name": "Mimir budget",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ae4gleqg61a80e",
+    "name": "Mimir bufferson-rcvr",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdl8qd5b3hts0e",
+    "name": "Mimir bufferson-rpl",
+    "type": "prometheus"
+  },
+  {
+    "uid": "wCUl5-pIk",
+    "name": "Mimir business",
+    "type": "prometheus"
+  },
+  {
+    "uid": "PhilEiJIz",
+    "name": "Mimir cache-warmup",
+    "type": "prometheus"
+  },
+  {
+    "uid": "edkybpctu4q9sf",
+    "name": "Mimir callbacks",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddkybpd89jm68f",
+    "name": "Mimir calltracking",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ce3v9cphwaigwc",
+    "name": "Mimir cloudwatch",
+    "type": "prometheus"
+  },
+  { 
+    "uid": "ce3v9cphwaigwc",
+    "name": "Mimir cloudwatchlogs",
+    "type": "prometheus"
+  },
+  {
+    "uid": "qq8l5-tSz",
+    "name": "Mimir cobalt",
+    "type": "prometheus"
+  },
+  {
+    "uid": "zRwl5-pSz",
+    "name": "Mimir communications",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddj1xmrzdh2iob",
+    "name": "Mimir credentials",
+    "type": "prometheus"
+  },
+  {
+    "uid": "GzQlc-tIz",
+    "name": "Mimir crm-slot-sync",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdl0xdftarr40a",
+    "name": "Mimir customerinfo",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddrhdq4zasxs0d",
+    "name": "Mimir customerinfowkr",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddl0xdg9llwcgf",
+    "name": "Mimir deliveryrpc",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdp4460ukrxtsf",
+    "name": "Mimir deliveryworker",
+    "type": "prometheus"
+  },
+  {
+    "uid": "be4ci7yq9xj40f",
+    "name": "Mimir deploy",
+    "type": "prometheus"
+  },
+  {
+    "uid": "9MVrs7vIz",
+    "name": "Mimir deploy-ui",
+    "type": "prometheus"
+  },
+  {
+    "uid": "jzBE7vASk",
+    "name": "Mimir deprecatedfield",
+    "type": "prometheus"
+  },
+  {
+    "uid": "de2h8aoo07zlsb",
+    "name": "Mimir developers",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdivbg9cmd81sd",
+    "name": "Mimir elastalert",
+    "type": "prometheus"
+  },
+  {
+    "uid": "zMwl5-tSz",
+    "name": "Mimir fake",
+    "type": "prometheus"
+  },
+  {
+    "uid": "K7Ql5apSz",
+    "name": "Mimir featureflags",
+    "type": "prometheus"
+  },
+  {
+    "uid": "JVQ_capIk",
+    "name": "Mimir feeds",
+    "type": "prometheus"
+  },
+  {
+    "uid": "USw_5atIz",
+    "name": "Mimir feedsworker",
+    "type": "prometheus"
+  },
+  {
+    "uid": "WDw_capSz",
+    "name": "Mimir fides",
+    "type": "prometheus"
+  },
+  {
+    "uid": "Adw_c-pIz",
+    "name": "Mimir fidesworker",
+    "type": "prometheus"
+  },
+  {
+    "uid": "9FQ_5apIz",
+    "name": "Mimir flagexpiry",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddzpgvwrfdgjkf",
+    "name": "Mimir fujimoto",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ntw_5apSz",
+    "name": "Mimir graph",
+    "type": "prometheus"
+  },
+  {
+    "uid": "HhQl5atIz",
+    "name": "Mimir gringotts",
+    "type": "prometheus"
+  },
+  {
+    "uid": "OTw_c-tIk",
+    "name": "Mimir handprint",
+    "type": "prometheus"
+  },
+  {
+    "uid": "tAw_capIz",
+    "name": "Mimir hercule",
+    "type": "prometheus"
+  },
+  {
+    "uid": "adl30ayohlrlsd",
+    "name": "Mimir hgrecssync",
+    "type": "prometheus"
+  },
+  {
+    "uid": "0JQ_c-pIk",
+    "name": "Mimir homeprofile",
+    "type": "prometheus"
+  },
+  {
+    "uid": "nORdAkhSk",
+    "name": "Mimir images",
+    "type": "prometheus"
+  },
+  {
+    "uid": "bxw_c-pIk",
+    "name": "Mimir incentives",
+    "type": "prometheus"
+  },
+  {
+    "uid": "-aw_5-tSk",
+    "name": "Mimir inference",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ae3dn3lpo89vkf",
+    "name": "Mimir job-cost-est",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdj1mxfi85vr4c",
+    "name": "Mimir kafka",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ae6j8a21i0o3ke",
+    "name": "Mimir kafkaproxy",
+    "type": "prometheus"
+  },
+  {
+    "uid": "bdxmrcb5rh4hse",
+    "name": "Mimir klaxon",
+    "type": "prometheus"
+  },
+  {
+    "uid": "edjnn2pd4e39cd",
+    "name": "Mimir lads",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ae4due8g1qy2ob",
+    "name": "Mimir lighthouse",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdl5jagkf20w0d",
+    "name": "Mimir locations",
+    "type": "prometheus"
+  },
+  {
+    "uid": "PfQ_c-pIz",
+    "name": "Mimir maintenanceplan",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdkxa8o27124gd",
+    "name": "Mimir messaging",
+    "type": "prometheus"
+  },
+  {
+    "uid": "bdivjhd9qmxa8d",
+    "name": "Mimir mmr-compactor",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdivjhdgocruod",
+    "name": "Mimir mmr-distributor",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddivm5s123nk0f",
+    "name": "Mimir mmr-ingester",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdivjhdoijawwc",
+    "name": "Mimir mmr-querier",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddivjhdvxqfwgb",
+    "name": "Mimir mmr-query-fe",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdivjhe7nrabkc",
+    "name": "Mimir mmr-query-schd",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdivjhef0giyob",
+    "name": "Mimir mmr-store-gtwy",
+    "type": "prometheus"
+  },
+  {
+    "uid": "yLwlc-pSk",
+    "name": "Mimir monetization",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ce4dp1m1seb5sb",
+    "name": "Mimir mts-ca-openai",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ee4dp1mb5iltsf",
+    "name": "Mimir mts-cr-openai",
+    "type": "prometheus"
+  },
+  {
+    "uid": "QPwlc-pIk",
+    "name": "Mimir negotiation",
+    "type": "prometheus"
+  },
+  {
+    "uid": "TX_8xnhIk",
+    "name": "Mimir newscast",
+    "type": "prometheus"
+  },
+  {
+    "uid": "uswl5atSk",
+    "name": "Mimir nextbestaction",
+    "type": "prometheus"
+  },
+  {
+    "uid": "CUQ_5apIk",
+    "name": "Mimir onboarding",
+    "type": "prometheus"
+  },
+  {
+    "uid": "be3zkkno4ghdsf",
+    "name": "Mimir ondemand",
+    "type": "prometheus"
+  },
+  {
+    "uid": "de4rit8scazuoc",
+    "name": "Mimir openfga",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cdlcatm6aeneoe",
+    "name": "Mimir pfremediation",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ee3re71lv38cgb",
+    "name": "Mimir pii-analyzer-1",
+    "type": "prometheus"
+  },
+  {
+    "uid": "vt4KCR0Iz",
+    "name": "Mimir pkgen",
+    "type": "prometheus"
+  },
+  {
+    "uid": "bdl2uy96esrggf",
+    "name": "Mimir pmtmethodssync",
+    "type": "prometheus"
+  },
+  {
+    "uid": "glQl5-tSz",
+    "name": "Mimir pricing",
+    "type": "prometheus"
+  },
+  {
+    "uid": "muQ_5-tIz",
+    "name": "Mimir pro_api",
+    "type": "prometheus"
+  },
+  {
+    "uid": "edijnaqridpfkf",
+    "name": "Mimir pro_auth",
+    "type": "prometheus"
+  },
+  {
+    "uid": "n9w_c-tIz",
+    "name": "Mimir profilesearch",
+    "type": "prometheus"
+  },
+  {
+    "uid": "SjQl5-tIz",
+    "name": "Mimir proinsights",
+    "type": "prometheus"
+  },
+  {
+    "uid": "v3Qlc-tIz",
+    "name": "Mimir projects",
+    "type": "prometheus"
+  },
+  {
+    "uid": "56w_catIz",
+    "name": "Mimir proloyalty",
+    "type": "prometheus"
+  },
+  {
+    "uid": "xg_lc-pIk",
+    "name": "Mimir prorecommend",
+    "type": "prometheus"
+  },
+  {
+    "uid": "yz_l5atIz",
+    "name": "Mimir quoting",
+    "type": "prometheus"
+  },
+  {
+    "uid": "VWcLNgSIz",
+    "name": "Mimir react-renderer",
+    "type": "prometheus"
+  },
+  {
+    "uid": "1rVKjRASz",
+    "name": "Mimir recommendation",
+    "type": "prometheus"
+  },
+  {
+    "uid": "SM__catIk",
+    "name": "Mimir requestform",
+    "type": "prometheus"
+  },
+  {
+    "uid": "t7ll5-pSk",
+    "name": "Mimir reviews",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddw7ou63rfuo0a",
+    "name": "Mimir risingwave",
+    "type": "prometheus"
+  },
+  {
+    "uid": "P4l_5-pIz",
+    "name": "Mimir rollouts",
+    "type": "prometheus"
+  },
+  {
+    "uid": "zhlh_U4Sk",
+    "name": "Mimir saleshydra",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdn3s9qappji8f",
+    "name": "Mimir schaaf",
+    "type": "prometheus"
+  },
+  {
+    "uid": "cvllc-pIk",
+    "name": "Mimir scheduling",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ce4dx2on93qwwf",
+    "name": "Mimir search_openai",
+    "type": "prometheus"
+  },
+  {
+    "uid": "oOllc-pIz",
+    "name": "Mimir secrets",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ee4g81df4yxvke",
+    "name": "Mimir semantic-search",
+    "type": "prometheus"
+  },
+  {
+    "uid": "aFllc-pIk",
+    "name": "Mimir seo",
+    "type": "prometheus"
+  },
+  {
+    "uid": "bdkxnmfhnndoga",
+    "name": "Mimir seologmetrics",
+    "type": "prometheus"
+  },
+  {
+    "uid": "ddm0wmwhpgykga",
+    "name": "Mimir seopagespeed",
+    "type": "prometheus"
+  },
+  {
+    "uid": "edq2txumthvr4c",
+    "name": "Mimir setltransfers",
+    "type": "prometheus"
+  },
+  {
+    "uid": "de49b5gbqpv5sa",
+    "name": "Mimir sp-k100-no-d",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdzb1pjedai9sc",
+    "name": "Mimir survey",
+    "type": "prometheus"
+  },
+  {
+    "uid": "Yc__5atIk",
+    "name": "Mimir targeting",
+    "type": "prometheus"
+  },
+  {
+    "uid": "8t__c-tSz",
+    "name": "Mimir telegraf",
+    "type": "prometheus"
+  },
+  {
+    "uid": "j6Gwu9hSz",
+    "name": "Mimir thumbprint",
+    "type": "prometheus"
+  },
+  {
+    "uid": "be6nbh08vmqrkf",
+    "name": "Mimir tophat",
+    "type": "prometheus"
+  },
+  {
+    "uid": "Xh__5-pIk",
+    "name": "Mimir users",
+    "type": "prometheus"
+  },
+  {
+    "uid": "edxj9kcgj1kaof",
+    "name": "Mimir webhooks",
+    "type": "prometheus"
+  },
+  {
+    "uid": "fdiiqejtmlmo0c",
+    "name": "Zipkin",
+    "type": "zipkin"
+  }
+]
