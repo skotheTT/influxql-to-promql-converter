@@ -12,6 +12,10 @@ LABEL_COMPARISON_OPERATORS = ["=", "!=", "=~", "!~"]
 LABEL_CONDITIONS_OPERATORS = ["<", ">", "<=", ">=", "="]
 TIME_INTERVAL_REGEX = "[0-9]+[mhdwy][s]?"  # Match time(<<interval>>)
 INVALID_PROMQL_METRIC_CHARACTERS = [".", "-"]
+INTERVALS = [
+    "$tinterval", "$interval", "$__interval", "$__rate_interval",
+    "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window"
+]
 
 AGGREGATION_MAP = {
     "count": "count",
@@ -781,11 +785,10 @@ class InfluxQLToM3DashboardConverter:
                 panel["targets"] = targets
                 over_times = set(over_times_list)
                 # Assume $__interval and $__rate_interval are covered by scraping interval
-                over_times.discard("$tinterval", )
-                over_times.discard("$interval")
-                over_times.discard("$__interval")
-                over_times.discard("$__rate_interval")
-                if len(over_times) > 0 and not panel.get("interval", None) and "$__range" not in over_times:
+                for key in INTERVALS:
+                    over_times.discard(key)
+
+		if len(over_times) > 0 and not panel.get("interval", None) and "$__range" not in over_times:
                     over_time_seconds = max(_duration_to_seconds(x) for x in over_times)
                     if over_time_seconds != SCRAPE_INTERVAL_SECONDS:
                         over_time = _seconds_to_duration(over_time_seconds)
@@ -812,6 +815,12 @@ class InfluxQLToM3DashboardConverter:
 
     def convert_dashboard(self, dashboard: dict) -> dict:
         LOG.info(f'Started dashboard conversion for: {dashboard.get("title")}')
+        # Append 'mimir' to the dashboard UID
+        if "uid" in dashboard and isinstance(dashboard["uid"], str):
+            dashboard["uid"] += "mimir"
+            LOG.info(f'Updated dashboard UID to: {dashboard["uid"]}')
+
+        dashboard["title"] = "(Mimir) " + dashboard["title"]
         self.current_dashboard = dashboard.get("title")
         templating = dashboard.get("templating")
         try:
