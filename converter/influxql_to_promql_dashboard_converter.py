@@ -1,5 +1,5 @@
 # Copyright (c) 2019 Aiven, Helsinki, Finland. https://aiven.io/
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
 import logging
 import re
@@ -10,11 +10,42 @@ SCRAPE_INTERVAL_SECONDS = 30
 OVER_TIME_AGGREGATIONS = ["avg", "min", "max", "sum", "quantile", "stddev", "stdvar", "count"]
 LABEL_COMPARISON_OPERATORS = ["=", "!=", "=~", "!~"]
 LABEL_CONDITIONS_OPERATORS = ["<", ">", "<=", ">=", "="]
-TIME_INTERVAL_REGEX = "[0-9]+[mhdwy][s]?"  # Match time(<<interval>>)
+OPERATOR_REGEX_MAP = {"=": "=~", "!=": "!~"}
+TIME_INTERVAL_REGEX = "[0-9]+[smhdwy][s]?"  # Match time(<<interval>>)
 INVALID_PROMQL_METRIC_CHARACTERS = [".", "-"]
 INTERVALS = [
     "$tinterval", "$interval", "$__interval", "$__rate_interval",
     "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window"
+]
+
+# When metrics type is histogram we usually need to use histgram_* functions. It's not easy to 
+# identify if the metrics is a histogram from the name itself. Ieally we should call grafana 
+# api/datasources/uid/yz_l5atIz/resources/api/v1/metadata endpoint to know the type of metrics
+# which will produce more accurate results. This is a temporary measure to differentiate.
+HISTOGRAM_METRICS_REGEX = [
+    r".*_capacity_units",
+    r".*_duration",
+    r".*_alloc",
+    r".*_goroutines",
+    r".*_stats_used",
+    r".*_stats_current_max",
+    r".*_query_length",
+    r"^router_connection_",
+    r"^proc_go_stats_.*",
+    r"routing_request_size",
+    r".*_in_cents",
+    r".*_latency*",
+    r".*_alert_count",
+    # r"error_count",
+    r".*_completion_tokens",
+    r"^cost_usage_",
+    r".*_generated_quote_count",
+    r".*_request_error_count",
+    r".*_permanently_unprocessed_service_count",
+    r".*_last_modified_time_stats_*",
+    r"routing_request_size",
+    r".*_input_price",
+    r"^memcache_operation_.*"
 ]
 
 AGGREGATION_MAP = {
@@ -26,7 +57,7 @@ AGGREGATION_MAP = {
     "mean": "avg",
     "non_negative_derivative": "rate",
     "non_negative_difference": "increase",
-    "percentile": "avg",  # Percentile not supported except for histograms
+    "percentile": "quantile",  
     "stddev": "stddev",
     "sum": "sum",
     # Last isn't supported by Prometheus queries but if we drop the aggregation altogether there won't be
@@ -38,6 +69,14 @@ AGGREGATION_MAP = {
     "moving_average": "avg",
     "derivative": "rate",
     "difference": "delta"
+}
+
+
+AGGREGATION_PERCENTILE_MAP = {
+    "max": 100,
+    "mean": 50,
+    "avg": 50,
+    "min": 0,
 }
 
 # convert count(x) to sum(count_over_time(x[interval/__range]))
@@ -65,6 +104,15 @@ METRIC_AGGREGATION_REGEXPS = [
 ]
 
 
+# Usually all the field names will have corresponding metric name in mimir, however certain fields are not
+# mapped same way.
+# For example: Metric name for ProcGoStats measurement with field name MemoryHeapAlloc is as expected converted
+# to proc_go_stats_memory_heap_alloc but in mimir the Metric is called proc_go_stats_memory_alloc so we need
+# this special handling in those cases
+SPECIAL_FIELD_NAMES_MAPPING = {
+    "MemoryHeapAlloc":"MemoryAlloc",
+}
+
 def _duration_to_seconds(v: str) -> int:
     v = v.lower()
     if v.endswith("s"):
@@ -88,6 +136,15 @@ def _seconds_to_duration(seconds: int) -> str:
     return f"{hours}h"
 
 
+def _convert_to_snake_case(name):
+    # Convert CamelCase to snake_case
+    # This regex finds a sequence of uppercase letters and inserts an underscore before it.
+    name = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name)
+    name = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', name)
+    name = name.replace("::tag", "")
+    return name.lower()
+
+
 class GroupBy(NamedTuple):
     group_by: str
     over_time: str
@@ -102,11 +159,10 @@ class InfluxQLToM3DashboardConverter:
     def __init__(
             self,
             *,
-            datasource_map: Optional[Dict[Any, str]] = None,
+            datasource_map: Optional[Dict[str, str]] = None,
             alert_notifications_map: Optional[Dict[int, str]] = None,
             alert_notifications_uid_map: Optional[Dict[str, str]] = None,
             scrape_interval: int = SCRAPE_INTERVAL_SECONDS,
-            replacement_datasource: str = None,
             log_level=logging.INFO
     ) -> None:
         logging.getLogger(__name__).setLevel(level=log_level)
@@ -118,7 +174,6 @@ class InfluxQLToM3DashboardConverter:
         self.group_by_labels = None
         self.metric_to_objects = {}  # dict of: metric -> {panel,dashboard title} to avoid iterating over all panels
         self.current_dashboard = ''
-        self.replacement_datasource = replacement_datasource
         # (Flag, metric and parent json of label_values string) object  to determine if the metric in the label_values requires replacement. i.e:
         # label_values(net,host) ---> label_values(net__bytes_recv,host). Any metric with the same service
         # is acceptable.
@@ -139,10 +194,19 @@ class InfluxQLToM3DashboardConverter:
 
     def add_to_metric_and_object_list(self, old_targets, new_targets):
         for i, old_target in enumerate(old_targets):
-            metric_name = old_target['measurement'] + "_"
-            # replace . and - with _ for the metric names. (promql valid metric name contains _ only)
-            metric_name += self.get_metric_field_from_select(old_target['select'])
-            metric_name = self._replace_invalid_metric_characters(metric_name)
+            if old_target.get("rawQuery"):
+                metric_name = self.get_metric_name_snake_case(old_target.get("query"))
+            elif old_target.get("measurement"):
+                metric_name = old_target.get("measurement") + "_"
+                # replace . and - with _ for the metric names. (promql valid metric name contains _ only)
+                metric_name += self.get_metric_field_from_select(old_target['select'])
+                # Replace camelCase in the measurement name with snake_case
+                metric_name = _convert_to_snake_case(metric_name)
+                metric_name = self._replace_invalid_metric_characters(metric_name)
+            else:
+                # No metric to add in this target.
+                continue
+
             try:
                 self.metric_to_objects[metric_name][self.current_dashboard].append(new_targets[i])
             except KeyError:
@@ -181,17 +245,29 @@ class InfluxQLToM3DashboardConverter:
                 notifications.append(new_notification)
         alert["notifications"] = notifications
 
+    def update_ds_to_mimir(self, datasource):
+        if not self.datasource_map:
+            return datasource
+        if isinstance(datasource, dict) and datasource.get("type") == "influxdb":
+            influx_ds_uid = datasource.get("uid")
+            mimir_ds_uid  = self.datasource_map.get(influx_ds_uid)
+            if mimir_ds_uid:
+                datasource["uid"] = mimir_ds_uid
+                datasource["type"] = "prometheus"
+                LOG.info(f'Updated datasource UID from influx {influx_ds_uid} to mimir {mimir_ds_uid} : ')
+            return datasource
+        else:
+            LOG.info(f"Datasource type is mixed for {datasource}, update datasource at targets level")
+            return datasource
+
     def convert_templating(self, template: dict) -> None:
         for item in template["list"]:
             if item["type"] == "query":
-                if self.replacement_datasource:
-                    item['datasource'] = self.replacement_datasource
-                elif self.datasource_map:
-                    datasource = item["datasource"]
-                    # Recent grafana -> hope it is ok
-                    if isinstance(datasource, dict):
-                        continue
-                    item["datasource"] = self.datasource_map.get(datasource, datasource)
+                datasource = item["datasource"]
+                if datasource.get("type") == "prometheus":
+                    LOG.info(f"Skipping item query for prometheus datasource {datasource}")
+                    continue
+                item["datasource"] = self.update_ds_to_mimir(datasource)
                 item["sort"] = 3  # Numerical(asc)
                 query = item["query"]
                 # Uncommon case where they query is a dict
@@ -199,20 +275,26 @@ class InfluxQLToM3DashboardConverter:
                     query = query['query']
                 query = self._replace_invalid_metric_characters(query)
                 pattern = r"show tag values from (?P<tag>.+?) with key\s?=\s?['|\"](?P<key>.+?)['|\"]( where service_type\s?=\s?['|\"](?P<service_type>.+?)['|\"] and time > now\(\) - (?P<interval>.+?$))?"
-                m = re.search(pattern, query)
+                m = re.search(pattern, query, re.IGNORECASE)
                 if m is None:
                     pattern = r"SHOW TAG VALUES FROM ['|\"]?(?P<tag>.+?)['|\"]? WITH KEY\s?=\s?['|\"](?P<key>.+?)['|\"]"
-                    m = re.search(pattern, query)
+                    m = re.search(pattern, query, re.IGNORECASE) 
                 if m is None:
                     # check dashboard for alternative definition
                     m = self.extract_key_all_case(query)
                 if m is None:
-                    raise ValueError(f"Unable to find tag values or key from {query!r}")
+                    LOG.warning(f"Unable to find tag values or key from {query!r} ignoring")
+                    continue
 
                 groupdict = m.groupdict()
+                # Metric in mimir is always in snake_case and append _count to the metric name
                 metric = groupdict.get("tag")
-
                 key = groupdict["key"]
+                if metric:
+                    metric = _convert_to_snake_case(metric) + "_count"
+                if key:
+                    key = _convert_to_snake_case(key)
+
                 service_type = groupdict.get("service_type")
                 interval = groupdict.get("interval")
 
@@ -234,12 +316,23 @@ class InfluxQLToM3DashboardConverter:
                 raise ValueError(f"Unknown template type for item {item}")
 
     def extract_key_all_case(self, query):
-        pattern = r"SHOW TAG VALUES WITH KEY\s?=\s?['|\"](?P<key>.*?)['|\"]"
-        m = re.search(pattern, query)
-        if not m:
-            pattern = r"show tag values with key\s?=\s?['|\"](?P<key>.*?)['|\"]"
-            m = re.search(pattern, query)
+        pattern = r"SHOW TAG VALUES WITH KEY\s?=\s?(?:['\"])?(?P<key>[a-zA-Z0-9_]+)(?:['\"])?"
+        m = re.match(pattern, query, re.IGNORECASE)
         return m
+
+    def get_group_by_tags(self, group_bys : str) -> List[str]:
+        group_bys = group_bys.replace("::tag", "").replace('"', "")
+        return group_bys.split(",")
+
+    def is_rate_aggregation(self, aggregations: List[str], metric_name: str) -> bool:
+        if any(agg in aggregations for agg in ["rate", "quantile", "mean", "avg"]):
+            # mean - we generally use histogram_quantile(0.5, sum by(rate..)) for mean
+            return True
+        if any(agg in aggregations for agg in ["max", "min"]):
+            for metric_re in HISTOGRAM_METRICS_REGEX:
+                if re.match(metric_re, metric_name) is not None:
+                    return True
+        return False
 
     def format_expression(
             self,
@@ -247,10 +340,12 @@ class InfluxQLToM3DashboardConverter:
             divide_by_self: bool,
             metric_name: str,
             aggregations: List[str],
-            labels: str,
+            label_filters: str,
             group_by: Optional[GroupBy],
             modifications: List[str],
             conditions,
+            percentile_value: Optional[str] = None,
+            offset_in_seconds: Optional[int] = None,
     ) -> Tuple[str, List[str], List[str]]:
         if not isinstance(conditions, list):
             conditions = [conditions]
@@ -259,10 +354,12 @@ class InfluxQLToM3DashboardConverter:
         expressions = []
         over_times = []
         for condition in conditions:
-            expr = ""
             over_time_aggregations = set()
             over_time = group_by.over_time if group_by else None
             aggregation = aggregations[-1] if aggregations else ""
+            group_by_tags = self.get_group_by_tags(group_by.group_by) if group_by and group_by.group_by else []
+            orig_aggregation = ""
+
             if group_by:
                 if not over_time:
                     if "count" in aggregations:
@@ -270,11 +367,23 @@ class InfluxQLToM3DashboardConverter:
                 else:
                     for aggregation in aggregations:
                         if aggregation in OVER_TIME_AGGREGATIONS:
-                            if "rate" in aggregations:
+                            if self.is_rate_aggregation(aggregations, metric_name):
                                 over_time_aggregations.add("rate")
-                            elif "increase" in aggregations:
+                                percentile_value = AGGREGATION_PERCENTILE_MAP.get(aggregation, percentile_value)
+                                # For over time aggregation of rate type we need to use sum
+                                # and wrap it with histogram_quantile(percentile, ...).
+                                orig_aggregation = aggregation
+                                aggregation = "sum"
+                            elif any(agg in aggregations for agg in ["increase", "count", "sum"]):
                                 over_time_aggregations.add("increase")
-                            else:
+                                orig_aggregation = aggregation
+                                aggregation = "sum"
+                            elif any(agg in aggregations for agg in ["max", "min"]):
+                                # Over time aggregation are part of inner expression so it should
+                                # fine to add them even if there are group_by tags
+                                # For example max by (app)(max_over_time(metric)[period]) is valid
+                                over_time_aggregations.add(f"{aggregation}_over_time")
+                            elif not group_by_tags:
                                 over_time_aggregations.add(f"{aggregation}_over_time")
             if divide_by_self:
                 if not condition:
@@ -292,27 +401,38 @@ class InfluxQLToM3DashboardConverter:
                     aggregation = self.get_metric_aggregation(metric_name)
                     if not over_time:
                         over_time = "$__rate_interval"
-                if group_by and (group_by.group_by or over_time_aggregations):
-                    if not condition:  # count works better than sum if count_over_time is omitted
-                        aggregation = AGGREGATION_TOPLEVEL_MAP.get(aggregation, aggregation)
-                    if not over_time:  # discard aggregation from group by when over time function is used
-                        expr += "{}{}".format(aggregation, self._replace_invalid_metric_characters(group_by.group_by))
-                else:
-                    expr += aggregation
-            if condition and set(aggregations).difference({"avg", "max", "min"}):
-                over_time_aggregations = set()
-                # We can't do over time aggregation in this case (as it is
-                # done before filtering); hopefully result is still ok and
-                # covered by e.g. over_time.
-                #
-                # e.g. count, and sum break badly if filtering order is wrong
-            expr += "("
+                # Below works sometimes but doesn't work for other graphs. Review what is the correct way
+                # to determine if we should add $__rate_interval?
+                if aggregation in {"max", "min"}:
+                    if any(otg in over_time_aggregations for otg in ["max_over_time", "min_over_time"]):
+                        if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE):
+                            over_time = "$__rate_interval"
+                if any(otg in over_time_aggregations for otg in ["rate"]):
+                    if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE):
+                        over_time = "$__rate_interval"
+
+            # Handle group_by tags for PromQL
+            aggregation_str = ""
+            if group_by_tags:
+                tags_str = ", ".join(group_by_tags)
+                tags_str = _convert_to_snake_case(tags_str)
+                aggregation_str = f"{aggregation} by {tags_str} "
+            else:
+                aggregation_str = aggregation
+
             inner_expr = ""
             if over_time_aggregations:
                 inner_expr += "{}(".format(" ".join(over_time_aggregations))
-            inner_expr += metric_name
-            if labels:
-                inner_expr += f"{{{labels}}}"
+            else:
+                inner_expr = "("
+
+            metrics_label_exp = metric_name
+            if label_filters:
+                metrics_label_exp += f"{{{label_filters}}}"
+
+            inner_expr += metrics_label_exp
+            default_expr = ""
+
             if over_time:
                 scrape_interval = self.scrape_interval
                 for metric_prefix, scrape_interval_override in NONDEFAULT_METRIC_PREFIX_SCRAPE_INTERVAL_SECONDS.items():
@@ -326,20 +446,51 @@ class InfluxQLToM3DashboardConverter:
                         over_times.append(_seconds_to_duration(scrape_interval * 4))
                 else:
                     over_times.append(_seconds_to_duration(scrape_interval))
+
                 if over_time_aggregations:
-                    # replace time frame i.e 5m, 1h etc with $__interval
-                    interval_replace = re.sub(TIME_INTERVAL_REGEX, "$__interval", over_time)
-                    inner_expr += f"[{interval_replace}]"
+                    # interval_replace = re.sub(TIME_INTERVAL_REGEX, "$__interval", over_time)
+                    # print(f"interval_replace: {interval_replace} when over_time: {over_time}")
+                    inner_expr += f"[{over_time}]"
+                    if offset_in_seconds:
+                        inner_expr += f" offset {offset_in_seconds}s"
+
                 over_times.append(over_time)
+
             if over_time_aggregations:
                 inner_expr += f"){condition}"
             else:
                 inner_expr += "{conditions}){modifications}".format(
                     modifications=" ".join(modifications), conditions=condition
                 )
-            expr += inner_expr
+
+            # Add Default expression assuming the code is not setting the default value.
+            # Add comment about default expression.
+            if aggregation == "sum" and  any(otg in over_time_aggregations for otg in ["increase", "rate"]):
+                histogram = any(re.match(metric_re, metric_name) for metric_re in HISTOGRAM_METRICS_REGEX)
+                if orig_aggregation == "max" or orig_aggregation == "min":
+                    # For max_over_time and min_over_time not using any default expression.
+                    default_expr = ""
+                else:
+                    default_expr = f"({metrics_label_exp} unless {metrics_label_exp} offset {over_time}) or {metrics_label_exp} offset {over_time} * 0"
+
+            expr = ""
+            if default_expr:
+                expr += f"{aggregation_str} ({inner_expr}) + \n # Optional - Default exp can be removed if code is initializing it \n {aggregation_str} ({default_expr})"
+            else:
+                expr += f"{aggregation_str} ({inner_expr})"
+
             if over_time_aggregations:
-                expr += ") {modifications}".format(modifications=" ".join(modifications))
+                if "rate" in over_time_aggregations and "sum" == aggregation:
+                    expr = f"histogram_quantile({percentile_value}/100, {expr})"
+                if "increase" in over_time_aggregations and "sum" == aggregation:
+                    for metric_re in HISTOGRAM_METRICS_REGEX:
+                        if re.match(metric_re, metric_name) is not None:
+                            if orig_aggregation == "sum":
+                                expr = f"histogram_sum({expr})"
+                            if orig_aggregation == "count":
+                                expr = f"histogram_count({expr})"
+                expr += "{modifications}".format(modifications=" ".join(modifications))
+
             expressions.append(expr.replace("'", "'"))
         fills = group_by.fills if group_by else []
         return " or ".join(expressions), over_times, fills
@@ -353,7 +504,25 @@ class InfluxQLToM3DashboardConverter:
         part2 = re.search(r'(\("|\(|\")([\w.]+)("\)|\)|")', query, re.IGNORECASE)
         if part2 is None:
             raise ValueError(f"Unable to find (single) metric key in {query}")
-        return part1.group(1), part2.group(1) if part2.group(1) not in {'"', "(", '("'} else part2.group(2)
+        series_name = part1.group(1)
+        # Check if part2 is "duration" and if it is used with count
+        if part2.group(2).lower() == "duration" and re.search(r'count\(\s*"?duration"?\s*\)', query, re.IGNORECASE):
+            return series_name, "count"
+
+        field_name = part2.group(1) if part2.group(1) not in {'"', "(", '("'} else part2.group(2)
+        if field_name in SPECIAL_FIELD_NAMES_MAPPING:
+            field_name = SPECIAL_FIELD_NAMES_MAPPING[field_name]
+        return series_name, field_name
+
+    # Returns metric name as series_field_name in snake case.
+    def get_metric_name_snake_case(self, query: str) -> str:
+        series_name, field_name = self.get_metric_name(query)
+        field_name = field_name.replace(".", "_")  # Specific use case for metric names with . as a seperator
+        metric_name = "{}_{}".format(series_name, field_name)
+        # Replace camelCase in the measurement name with snake_case
+        metric_name = _convert_to_snake_case(metric_name)
+        return self._replace_invalid_metric_characters(metric_name)
+
 
     def get_aggregations(self, query: str) -> List[str]:
         part1 = re.search(r"select (.*) from", query, re.IGNORECASE)
@@ -363,12 +532,21 @@ class InfluxQLToM3DashboardConverter:
         part3 = [AGGREGATION_MAP[item] for item in part2 if item in AGGREGATION_MAP]
         return part3
 
-    def get_labels(self, query: str, *, field_name: str) -> Tuple[str, str]:
+
+    def get_percentile(self, query: str, aggregations: List[str]) -> Optional[str]:
+        if aggregations != ["quantile"]:
+            return None
+        match = re.search(r'percentile\(\s*".+?"\s*,\s*([\w$]+)\s*\)', query, re.IGNORECASE)
+        if match:
+            return str(match.group(1))
+        return None
+
+    def get_label_filters(self, query: str, *, field_name: str) -> Tuple[str, str]:
         """Converts any equals, not equals, like and not like InfluxQL where conditions into corresponding Prometheus conditions.
 
         E.g. "abc" = def AND foo =~ /bar$/ => abc='def',foo=~'.*bar'
         """
-        labels = set()
+        label_filters = set()
 
         # Bit hacky regexp handling trick:
         #
@@ -384,7 +562,7 @@ class InfluxQLToM3DashboardConverter:
                 # only r[1]s differ -> we can create regexp to match them
                 key = next(iter(keys))
                 values = "|".join(r[1] for r in results)
-                labels.add(f'{key}=~"{values}"')
+                label_filters.add(f'{_convert_to_snake_case(key)}=~"{values}"')
                 return ""
             return original_string
 
@@ -397,9 +575,10 @@ class InfluxQLToM3DashboardConverter:
                 # Actual content matching is non-greedy as there may be forward slashes later in content.
                 # Field name may or may not be double quoted. If it isn't, it should be simple alphanumeric
                 # string.
-                regex = r'(\w+?|"\S+?")\s*{}\s*/(.*?)(?<!\\)(?:\\{{2}})*/'.format(operator)
+                regex = r'(\w+?|"\S+?")\s*{}\s*/(.*?)(?<!\\)(?:\\{{2}})*\$?/'.format(operator)
                 for (key, value) in re.findall(regex, query):
-                    key = key.lstrip('"').rstrip('"').replace('-', "_")
+                    key = key.replace("::tag", "").lstrip('"').rstrip('"').replace('-', "_")
+
                     if key == field_name:
                         continue
                     # InfluxQL regexes are search-like (match anywhere) while Prometheus does exact
@@ -418,12 +597,17 @@ class InfluxQLToM3DashboardConverter:
                     value = value.replace("\\", "\\\\")
                     # Need to escape single quotes
                     value = value.replace("'", "\\'")
-                    labels.add(f'{key}{operator}"{value}"')
+                    label_filters.add(f'{_convert_to_snake_case(key)}{operator}"{value}"')
             else:
                 # Non regex matches are of the form "field" = foobar or "field" = 'foo-bar'. Look for
                 # both forms separately. Field name may or may not be double quoted. If it isn't, it
                 # should be simple alphanumeric string.
-                regex = r'(\w+?|"\S+?")\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
+                # regex = r'(\w+?|"\S+?")\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
+                regex = r'((?:"\w+"|[a-zA-Z_]\w*)::\w+?)\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
+
+                # Dictionary to collect values for each key. This is needed so we could
+                # Or the values with same key.
+                key_values_map = {}
 
                 def _escape_backslashes(s):
                     # There's stuff like "aiven\.prune" floating
@@ -434,21 +618,33 @@ class InfluxQLToM3DashboardConverter:
                     return s.replace("\\", "\\\\")
 
                 for (key, value) in re.findall(regex, query):
-                    key = key.lstrip('"').rstrip('"')
+                    key = key.replace("::tag", "").lstrip('"').rstrip('"') 
                     if key == field_name:
                         continue
                     value = _escape_backslashes(value)
-                    labels.add(f'{key}{operator}"{value}"')
+                    key_values_map.setdefault(key, []).append(value)
                 # Non-quoted value variant is terminated either by whitespace or closing parenthesis
                 regex = r'(\w+?|"\S+?")\s*{}\s*([^\s\'~].*?)(?:\)|\s)'.format(operator)
                 for (key, value) in re.findall(regex, query):
-                    key = key.lstrip('"').rstrip('"')
+                    key = key.replace("::tag", "").lstrip('"').rstrip('"')
                     if key == field_name:
                         continue
                     value = _escape_backslashes(value)
-                    labels.add(f'{key}{operator}"{value}"')
+                    key_values_map.setdefault(key, []).append(value) 
 
-        return query, ",".join(sorted(labels))
+                # Generate label filters
+                for key, values in key_values_map.items():
+                    if len(values) > 1:
+                        operator = OPERATOR_REGEX_MAP.get(operator, operator)
+                        # Multiple values for the same key, combine with `|` using regex operator
+                        combined_values = "|".join(values)
+                        label_filters.add(f'{_convert_to_snake_case(key)}{operator}"{combined_values}"')
+                    else:
+                        # Single value for the key, use `=` or the specified operator
+                        label_filters.add(f'{_convert_to_snake_case(key)}{operator}"{values[0]}"')
+
+
+        return query, ",".join(sorted(label_filters))
 
     def get_conditions(self, query: str, *, field_name: str) -> Union[str, List[str]]:
         conditions = []
@@ -488,7 +684,9 @@ class InfluxQLToM3DashboardConverter:
         fills = []
         group_by = []
         time_val = ""
-        groups = query.lower().split("group by")
+        # groups = query.lower().split("group by")
+        groups = re.split("group by", query, flags=re.IGNORECASE)
+
         if len(groups) < 2:
             return None
         groups = groups[1].split(" ")
@@ -510,18 +708,22 @@ class InfluxQLToM3DashboardConverter:
                     continue
                 group_by.append(group.replace(",", "").replace('"', ""))
         self.group_by_labels = group_by
-        group_by_str = " by ({})".format(",".join(group_by)) if group_by else ""
+        group_by_str = "({})".format(",".join(group_by)) if group_by else ""
         return GroupBy(group_by=group_by_str, over_time=time_val, fills=fills)
 
-    def convert_expression(self, query: str) -> Tuple[str, List[str], List[str]]:
+    def convert_expression(self, query: str, offset_in_sec:int) -> Tuple[str, List[str], List[str]]:
         series_name, field_name = self.get_metric_name(query)
         field_name = field_name.replace(".", "_")  # Specific use case for metric names with . as a seperator
         metric_name = "{}_{}".format(series_name, field_name)
+        metric_name = _convert_to_snake_case(metric_name)
         aggregations = self.get_aggregations(query)
         if aggregations == ["avg"]:
             default_aggregation = self.get_metric_aggregation(metric_name)
             aggregations = [default_aggregation]
-        query, labels = self.get_labels(query, field_name=field_name)
+
+        percentile_value = self.get_percentile(query, aggregations)
+        query, label_filters = self.get_label_filters(query, field_name=field_name)
+
         modifications = self.get_modifications(query)
         group_by = self.get_group_by(query)
         if not aggregations and group_by and group_by.group_by:
@@ -533,17 +735,20 @@ class InfluxQLToM3DashboardConverter:
         divide_by_self = self.does_divide_by_self(query)
         if divide_by_self and (conditions or modifications):
             raise ValueError(f"Unsupported query {query}, divide by self combined with conditions or modifications")
+
         return self.format_expression(
             divide_by_self=divide_by_self,
             metric_name=metric_name,
             aggregations=aggregations,
-            labels=labels,
+            label_filters=label_filters,
             group_by=group_by,
             modifications=modifications,
             conditions=conditions,
+            percentile_value=percentile_value,
+            offset_in_seconds=offset_in_sec,
         )
 
-    def convert_subquery(self, query: str) -> Tuple[str, List[str], List[str]]:
+    def convert_subquery(self, query: str, offset_in_seconds:Optional[int]) -> Tuple[str, List[str], List[str]]:
         # In-InfluxDB downsampling case:
         #
         # SUM .. FROM ( subquery GROUP BY X, Z ) GROUP BY X
@@ -571,7 +776,8 @@ class InfluxQLToM3DashboardConverter:
             inner2 = d["inner2"]
             outer_group = d["outer_group"]
             subquery = f"{inner1} {inner2} {outer_group}"
-            expr, over_times, fills = self.convert_expression(subquery)
+            expr, over_times, fills = self.convert_expression(subquery, offset_in_seconds)
+
             # This could be neater if we actually passed the desired outer
             # function to convert/format expression.
             if over_times:
@@ -582,7 +788,7 @@ class InfluxQLToM3DashboardConverter:
                     return expr, over_times, fills
         raise ValueError(f"Unsupported subquery in {query!r}")
 
-    def convert_special_or_expression(self, query):
+    def convert_special_or_expression(self, query, offset_in_sec:Optional[int]):
         # Handling for 'special' expressions that we hardcode.
         #
         # We should have real parser but oh well.
@@ -592,7 +798,7 @@ class InfluxQLToM3DashboardConverter:
         return_part, from_tail = m.groups()
         return_part = re.sub(r"\s+", " ", return_part).strip()
         if return_part == 'mean("num_fds") / mean("rlimit_num_fds_soft") * 100':
-            r = self.convert_expression(f'SELECT mean("num_fds") FROM {from_tail}')
+            r = self.convert_expression(f'SELECT mean("num_fds") FROM {from_tail}', offset_in_sec)
             exp_re = r"avg_over_time\(procstat_num_fds({[^}]+}\[[^\]]+\])\)"
             assert re.search(exp_re, r[0]) is not None, f"Unexpected input: {r[0]}"
 
@@ -612,22 +818,27 @@ class InfluxQLToM3DashboardConverter:
         if m is not None:
             # Redis panel specialty; this math doesn't really work as is
             constant, op, expr = m.groups()
-            r = self.convert_expression(f"SELECT {expr} FROM {from_tail}")
+            r = self.convert_expression(f"SELECT {expr} FROM {from_tail}", offset_in_sec)
             new_q = r[0].strip()
             return (f"{constant} {op} {new_q}", r[1], r[2])
 
-        return self.convert_expression(query)
+        return self.convert_expression(query, offset_in_sec)
 
-    def convert_query(self, query: str, target: dict, legend: str) -> Tuple[dict, List[str], List[str]]:
+    def convert_query(self, query: str, target: dict, legend: str, offset_in_sec:Optional[int]) -> Tuple[dict, List[str], List[str]]:
         if "<>" in query:
             raise ValueError(f"Unexpected <> found from query {query!r}, use != instead")
         if "(*)" in query:
             raise ValueError("Unsupported (*) query in {query!r}")
         if "from (" in query.lower():
-            expr, over_times, fills = self.convert_subquery(query)
+            expr, over_times, fills = self.convert_subquery(query, offset_in_sec)
         else:
-            expr, over_times, fills = self.convert_special_or_expression(query)
-        fmt = target["resultFormat"]
+            expr, over_times, fills = self.convert_special_or_expression(query, offset_in_sec)
+        group_by = self.get_group_by(query)
+        min_step = group_by.over_time if group_by else None
+        fmt = target.get("resultFormat", "time_series")
+        if not legend:
+            legend = self.get_metric_name_snake_case(query)
+
         new_target = {
             "expr": expr,
             "format": fmt,
@@ -635,21 +846,25 @@ class InfluxQLToM3DashboardConverter:
             "intervalFactor": 1,
             "refId": target["refId"],
             "legendFormat": legend,
+    	    "interval": min_step,
         }
 
         if "hide" in target:
             new_target["hide"] = target["hide"]
+        if "datasource" in target:
+            new_target["datasource"] = target["datasource"]
+
         return new_target, over_times, fills
 
-    def convert_to_query(self, target: dict, legend: str) -> Tuple[dict, List[str], List[str]]:
-        query = "SELECT "
+    def convert_to_query(self, target: dict, legend: str) -> [Tuple[dict, List[str], List[str]]]:
         value = ""
-        select_what = ""
+        select_what_list = []
         modifications: List[str] = []
         if target.get('select') is None:
             raise ValueError(f'Dashboard {self.current_dashboard} is invalid, missing select field in target')
 
         for select in target["select"]:
+            select_what = ""
             for item in select:
                 item_type = item["type"]
                 if item_type == "field":
@@ -662,7 +877,7 @@ class InfluxQLToM3DashboardConverter:
                         param_str = ", {}".format(item["params"][0])
                     if select_what:
                         select_what = f"{item_type}({select_what}{param_str})"
-                    elif item_type not in ('max', 'last'):
+                    elif item_type:
                         # else:
                         # Condition to filter unnecessary aggregation in m3
                         select_what = f'{item_type}("{value}"{param_str})'
@@ -674,16 +889,16 @@ class InfluxQLToM3DashboardConverter:
                     LOG.debug("Dropping unsupported item type: distinct")
                 else:
                     raise ValueError(f"Unknown item type {item_type!r} in {target!r}")
-
-        select_what = f'"{value}"' if select_what == "" else select_what
+            select_what =  f'"{value}"' if select_what == "" else select_what
+            select_what_list.append(select_what)
 
         where_items = ["$timeFilter"]
         if any(tag.get("condition") == "OR" for tag in target["tags"]):
             # Prometheus queries don't directly support label selection using OR. We can convert OR into
             # regular expression but only if all tags have the same key
-            keys = [tag["key"] for tag in target["tags"]]
+            keys = [tag["key"].replace("::tag", "") for tag in target["tags"]]
             if len(set(keys)) != 1:
-                raise ValueError(f"Unsupported OR for tags with different key: {target!r}")
+                raise ValueError(f"Unsupported OR for tags with different keys: {keys!r}")
             # We could support operators other than = but that would make the regex generation a bit difficult
             if not all(tag.get("operator") == "=" for tag in target["tags"]):
                 raise ValueError(f"Unsupported operator in OR tag: {target!r}")
@@ -716,14 +931,28 @@ class InfluxQLToM3DashboardConverter:
         if not target.get('measurement'):
             raise ValueError(f'Missing measurement field for target, in dashboard: {self.current_dashboard}')
 
-        query += '{select_what}{modifications} FROM "{measurement}" WHERE {where}{group_by}'.format(
-            select_what=select_what,
-            modifications=" ".join(modifications),
-            measurement=target["measurement"],
-            where=where,
-            group_by=group_by,
-        )
-        return self.convert_query(query, target, legend)
+        offset_in_sec = target.get("offset")
+
+        result = []
+        start_ref_id = target["refId"]
+        for index, select_what in enumerate(select_what_list):
+            # Each measurement in influx is a separate time series in mimir. So if the influx query has select for
+            # different fields then we need to create a separate measurement for each field.
+            query = 'SELECT {select_what}{modifications} FROM "{measurement}" WHERE {where}{group_by}'.format(
+                select_what=select_what,
+                modifications=" ".join(modifications),
+                measurement=target["measurement"],
+                where=where,
+                group_by=group_by,
+            )
+            new_target, new_over_times, new_fills = self.convert_query(query, target, legend, offset_in_sec)
+            # Append the index to refId if index > 0
+            if index > 0:
+                new_target["refId"] = f"{start_ref_id}{index}"  # Append index to refId
+            else:
+                new_target["refId"] = start_ref_id  # Use the original refId for index 0
+            result.append((new_target, new_over_times, new_fills))
+        return result
 
     def convert_series_overrides(self, overrides) -> List[dict]:
         new_overrides = []
@@ -744,6 +973,7 @@ class InfluxQLToM3DashboardConverter:
             legend_list = ["{{" + label + "}}" for label in self.group_by_labels]
             legend = " ".join(legend_list)
 
+        legend = _convert_to_snake_case(legend)
         return legend
 
     def convert_targets(self, targets: List[dict]) -> Tuple[List[dict], List[str], List[str]]:
@@ -751,18 +981,34 @@ class InfluxQLToM3DashboardConverter:
         r_over_times = []
         r_fills = []
         for target in targets:
+            datasource = target.get("datasource")
+            if datasource:
+                target["datasource"] = self.update_ds_to_mimir(datasource)
+                if target["datasource"].get("type") == "influxdb":
+                    LOG.info(f"Skipping target as couldn't get prometheus datasource for influx {datasource}")
+                    new_targets.append(target)
+                    continue
+
+
             legend = self.get_legend_format(target)
             if legend:
                 legend = self._replace_invalid_metric_characters(legend)  # replace to promql standard
             if target.get("rawQuery"):  # Some panels use raw query instead
                 query = target["query"].replace("\n", " ")
                 query = re.sub("  +", " ", query)
-                new_target, over_times, fills = self.convert_query(query, target, legend)
+                new_target, over_times, fills = self.convert_query(query, target, legend, None)
+                new_targets.append(new_target)
+                r_fills.extend(fills)
+                r_over_times.extend(over_times)
+            elif target.get("measurement"):
+                results = self.convert_to_query(target, legend)
+                for new_target, over_times, fills in results:
+                    new_targets.append(new_target)
+                    r_fills.extend(fills)
+                    r_over_times.extend(over_times)
             else:
-                new_target, over_times, fills = self.convert_to_query(target, legend)
-            new_targets.append(new_target)
-            r_fills.extend(fills)
-            r_over_times.extend(over_times)
+                # If target does not have rawQuery or measurement selected then ignore it.
+                continue
         return new_targets, r_over_times, r_fills
 
     def convert_panel(self, panel: dict) -> None:
@@ -771,24 +1017,29 @@ class InfluxQLToM3DashboardConverter:
             # instead under 'panels' list of the 'row'
             self.convert_panels(panel.get("panels", []))
             return
-        if self.replacement_datasource:
-            panel["datasource"] = self.replacement_datasource
-        elif self.datasource_map:
-            datasource = panel.get("datasource")
-            if datasource and (isinstance(datasource, dict) or datasource not in self.datasource_map):
-                return
-            panel["datasource"] = self.datasource_map[panel.get("datasource")]
+
+        datasource = panel["datasource"]
+        if datasource.get("type") == "prometheus":
+            LOG.info(f"Skipping panel as it's already prometheus datasource {datasource}")
+            return
+
+        panel["datasource"] = self.update_ds_to_mimir(datasource)
+        if panel["datasource"].get("type") == "influxdb":
+            LOG.info(f"Skipping panel as couldn't get prometheus datasource for influx {datasource}")
+            return
+
         try:
             if "targets" in panel:
                 targets, over_times_list, fills_list = self.convert_targets(panel["targets"])
                 self.add_to_metric_and_object_list(panel['targets'], targets)
                 panel["targets"] = targets
+                panel["title"] = panel["title"] + " (M)"
                 over_times = set(over_times_list)
                 # Assume $__interval and $__rate_interval are covered by scraping interval
                 for key in INTERVALS:
                     over_times.discard(key)
 
-		if len(over_times) > 0 and not panel.get("interval", None) and "$__range" not in over_times:
+                if len(over_times) > 0 and not panel.get("interval", None) and "$__range" not in over_times:
                     over_time_seconds = max(_duration_to_seconds(x) for x in over_times)
                     if over_time_seconds != SCRAPE_INTERVAL_SECONDS:
                         over_time = _seconds_to_duration(over_time_seconds)

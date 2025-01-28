@@ -1,7 +1,7 @@
 log_level: # optional default is INFO
 importer:
   folder:
-    path:  ./tt_influxql
+    path: ./tt_influxql
 exporter:
   folder:
     path: ./tt_promql

@@ -1,6 +1,9 @@
 import importlib
+import json
 import logging
 import time
+from typing import Optional, Dict
+
 import yaml
 
 from converter.influxql_to_promql_dashboard_converter import InfluxQLToM3DashboardConverter, ConvertError
@@ -23,8 +26,6 @@ def create_class_name(module: str, module_type: str) -> str:
     capitalized_module_name = re.sub("(^|[_])\s*([a-zA-Z])", lambda p: p.group(0).upper(), module)
     return capitalized_module_name.replace("_", "") + module_type.capitalize()
 
-
-# TODO improve logic
 def is_influx_dashboard(dashboard_item):
     expr_exists = False  # promql dashboard will have an expr element in targets
     try:
@@ -35,7 +36,7 @@ def is_influx_dashboard(dashboard_item):
                         return True
                     elif target.get('expr'):
                         expr_exists = True
-            elif panel.get('panels'):
+            if panel.get('panels'):
                 for inner_panel in panel['panels']:
                     if inner_panel.get('targets'):
                         for target in inner_panel['targets']:
@@ -47,7 +48,6 @@ def is_influx_dashboard(dashboard_item):
         logger.warning(f"Dashboard {dashboard_item['title']} is not a valid influxdb dashboard, skipping.")
         return False
     return expr_exists
-
 
 def run():
     start_time = time.time()
@@ -97,12 +97,9 @@ def build_module_list_from_config(module_names, modules) -> dict:
 def construct_datasource_mapping() -> Optional[Dict[str, str]]:
     """
     Reads JSON data and constructs a mapping of 'uid' from InfluxDB to Mimir datasources based on their names.
-
-    :param json_data: JSON string containing an array of objects with 'uid', 'name', and 'type'.
     :return: A dictionary mapping 'InfluxDB' uids to 'Mimir' uids based on matching names suffix, or None if input is invalid.
     """
     try:
-
         with open("tt_datasources.json", 'r') as stream:
             # Parse the JSON string
             data = json.load(stream)
@@ -177,6 +174,7 @@ def process_dashboards(metric_to_objects, processors, report) -> dict:
 
 def convert_dashboards(converter, dashboards, influx_dashboards, invalid_dashboards):
     for dashboard in dashboards:
+        print(f"processing {dashboard['title']}")
         if is_influx_dashboard(dashboard):
             logger.info(f"Starting dashboards conversion")
             try:
