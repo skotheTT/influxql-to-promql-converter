@@ -15,7 +15,7 @@ TIME_INTERVAL_REGEX = "[0-9]+[smhdwy][s]?"  # Match time(<<interval>>)
 INVALID_PROMQL_METRIC_CHARACTERS = [".", "-"]
 INTERVALS = [
     "$tinterval", "$interval", "$__interval", "$__rate_interval",
-    "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window"
+    "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window", "$group_by"
 ]
 
 # When metrics type is histogram we usually need to use histgram_* functions. It's not easy to 
@@ -267,7 +267,6 @@ class InfluxQLToM3DashboardConverter:
                 if datasource.get("type") == "prometheus":
                     LOG.info(f"Skipping item query for prometheus datasource {datasource}")
                     continue
-                item["datasource"] = self.update_ds_to_mimir(datasource)
                 item["sort"] = 3  # Numerical(asc)
                 query = item["query"]
                 # Uncommon case where they query is a dict
@@ -285,6 +284,8 @@ class InfluxQLToM3DashboardConverter:
                 if m is None:
                     LOG.warning(f"Unable to find tag values or key from {query!r} ignoring")
                     continue
+                # Update datasource to mimir only if the query can be updated to use mimir datasource
+                item["datasource"] = self.update_ds_to_mimir(datasource)
 
                 groupdict = m.groupdict()
                 # Metric in mimir is always in snake_case and append _count to the metric name
@@ -893,7 +894,8 @@ class InfluxQLToM3DashboardConverter:
             select_what_list.append(select_what)
 
         where_items = ["$timeFilter"]
-        if any(tag.get("condition") == "OR" for tag in target["tags"]):
+        target_tags = target.get("tags")
+        if target_tags and any(tag.get("condition") == "OR" for tag in target_tags):
             # Prometheus queries don't directly support label selection using OR. We can convert OR into
             # regular expression but only if all tags have the same key
             keys = [tag["key"].replace("::tag", "") for tag in target["tags"]]
@@ -904,8 +906,8 @@ class InfluxQLToM3DashboardConverter:
                 raise ValueError(f"Unsupported operator in OR tag: {target!r}")
             values = [re.escape(tag["value"]) for tag in target["tags"]]
             where_items.append('"{key}"=~/^{value}$/'.format(key=keys[0], value="|".join(values)))
-        else:
-            for tag in target["tags"]:
+        elif target_tags:
+            for tag in target_tags:
                 operator = tag["operator"]
                 # Our query parsing doesn't handle <> correctly, use != instead
                 if operator == "<>":
