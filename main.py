@@ -60,10 +60,11 @@ def run():
     config = build_module_list_from_config(module_names, modules)
     datasource_mapping = construct_datasource_mapping()
     logging.getLogger(__name__).setLevel(level=get_log_level_descriptor(config.get('log_level')))
-
+    default_measurement = config.get('default_measurement')
     import_dashboards(dashboards, modules[0])
     converter = InfluxQLToM3DashboardConverter(datasource_map=datasource_mapping,
-                                               log_level=get_log_level_descriptor(config.get('log_level')))
+                                               log_level=get_log_level_descriptor(config.get('log_level')),
+                                               default_measurement=default_measurement)
     influx_dashboards = []
     convert_dashboards(converter, dashboards, influx_dashboards, invalid_dashboards)
     metric_to_objects = converter.metric_to_objects
