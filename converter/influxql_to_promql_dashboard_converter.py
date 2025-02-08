@@ -45,7 +45,17 @@ HISTOGRAM_METRICS_REGEX = [
     r".*_last_modified_time_stats_*",
     r"routing_request_size",
     r".*_input_price",
-    r"^memcache_operation_.*"
+    r"^memcache_operation_.*",
+    r"endpoint_*",
+    r"budget_overserving_filterer_*",
+    r"trigger_budget_overserving_upsell_*",
+    r"result_quality_has_zero_services",
+    r"result_quality_num_budget_overserved_services",
+    r"budget_overserving_upsell_failure_failed_offer_count",
+    r"missing_budget_overserving_upsell_pro_user_pk",
+    r"instant_results_request_quality_has_project_pk",
+    r"instant_results_filter_num_filtered_services",
+    r"compound_quote_type_filter_num_*",
 ]
 
 AGGREGATION_MAP = {
@@ -163,7 +173,8 @@ class InfluxQLToM3DashboardConverter:
             alert_notifications_map: Optional[Dict[int, str]] = None,
             alert_notifications_uid_map: Optional[Dict[str, str]] = None,
             scrape_interval: int = SCRAPE_INTERVAL_SECONDS,
-            log_level=logging.INFO
+            log_level=logging.INFO,
+            default_measurement: Optional[bool] = None,
     ) -> None:
         logging.getLogger(__name__).setLevel(level=log_level)
 
@@ -174,6 +185,8 @@ class InfluxQLToM3DashboardConverter:
         self.group_by_labels = None
         self.metric_to_objects = {}  # dict of: metric -> {panel,dashboard title} to avoid iterating over all panels
         self.current_dashboard = ''
+        self.default_measurement = default_measurement
+
         # (Flag, metric and parent json of label_values string) object  to determine if the metric in the label_values requires replacement. i.e:
         # label_values(net,host) ---> label_values(net__bytes_recv,host). Any metric with the same service
         # is acceptable.
@@ -406,10 +419,10 @@ class InfluxQLToM3DashboardConverter:
                 # to determine if we should add $__rate_interval?
                 if aggregation in {"max", "min"}:
                     if any(otg in over_time_aggregations for otg in ["max_over_time", "min_over_time"]):
-                        if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE):
+                        if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE) and over_time not in INTERVALS:
                             over_time = "$__rate_interval"
                 if any(otg in over_time_aggregations for otg in ["rate"]):
-                    if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE):
+                    if not re.match(TIME_INTERVAL_REGEX, over_time, re.IGNORECASE) and over_time not in INTERVALS:
                         over_time = "$__rate_interval"
 
             # Handle group_by tags for PromQL
@@ -466,7 +479,8 @@ class InfluxQLToM3DashboardConverter:
 
             # Add Default expression assuming the code is not setting the default value.
             # Add comment about default expression.
-            if aggregation == "sum" and  any(otg in over_time_aggregations for otg in ["increase", "rate"]):
+            if (aggregation == "sum" and
+                    any(otg in over_time_aggregations for otg in ["increase", "rate"])):
                 histogram = any(re.match(metric_re, metric_name) for metric_re in HISTOGRAM_METRICS_REGEX)
                 if orig_aggregation == "max" or orig_aggregation == "min":
                     # For max_over_time and min_over_time not using any default expression.
@@ -475,8 +489,8 @@ class InfluxQLToM3DashboardConverter:
                     default_expr = f"({metrics_label_exp} unless {metrics_label_exp} offset {over_time}) or {metrics_label_exp} offset {over_time} * 0"
 
             expr = ""
-            if default_expr:
-                expr += f"{aggregation_str} ({inner_expr}) + \n # Optional - Default exp can be removed if code is initializing it \n {aggregation_str} ({default_expr})"
+            if self.default_measurement and default_expr:
+                expr += f"{aggregation_str} ({inner_expr}) \n # Optional - Default exp uncomment below if the code is not initializing default value. \n  # + {aggregation_str} ({default_expr}) \n"
             else:
                 expr += f"{aggregation_str} ({inner_expr})"
 
@@ -603,8 +617,8 @@ class InfluxQLToM3DashboardConverter:
                 # Non regex matches are of the form "field" = foobar or "field" = 'foo-bar'. Look for
                 # both forms separately. Field name may or may not be double quoted. If it isn't, it
                 # should be simple alphanumeric string.
-                # regex = r'(\w+?|"\S+?")\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
-                regex = r'((?:"\w+"|[a-zA-Z_]\w*)::\w+?)\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
+                regex = r'(\w+?|"\S+?")\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
+                # regex = r'((?:"\w+"|[a-zA-Z_]\w*)::\w+?)\s*{}\s*\'(.*?)(?<!\\)(?:\\{{2}})*\''.format(operator)
 
                 # Dictionary to collect values for each key. This is needed so we could
                 # Or the values with same key.
@@ -619,6 +633,7 @@ class InfluxQLToM3DashboardConverter:
                     return s.replace("\\", "\\\\")
 
                 for (key, value) in re.findall(regex, query):
+                    LOG.info(f"key = {key} value = {value}")
                     key = key.replace("::tag", "").lstrip('"').rstrip('"') 
                     if key == field_name:
                         continue
@@ -627,6 +642,7 @@ class InfluxQLToM3DashboardConverter:
                 # Non-quoted value variant is terminated either by whitespace or closing parenthesis
                 regex = r'(\w+?|"\S+?")\s*{}\s*([^\s\'~].*?)(?:\)|\s)'.format(operator)
                 for (key, value) in re.findall(regex, query):
+                    LOG.info(f"key = {key} value = {value}")
                     key = key.replace("::tag", "").lstrip('"').rstrip('"')
                     if key == field_name:
                         continue

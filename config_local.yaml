@@ -5,3 +5,12 @@ importer:
 exporter:
   folder:
     path: ./tt_promql
+
+# The best practice is to initialize the measurement with the default values in code.
+# However, if not possible then set the default_measurement to true. This will provide
+# suggestion to append below promql query to the output query.
+# + <aggregation> by [group_by] (
+#    (metric{label_filter} unless metric{label_filter} offset <time>)
+#   or metric{label_filter} offset <time> * 0
+#  )
+default_measurement: true
