@@ -15,7 +15,8 @@ TIME_INTERVAL_REGEX = "[0-9]+[smhdwy][s]?"  # Match time(<<interval>>)
 INVALID_PROMQL_METRIC_CHARACTERS = [".", "-"]
 INTERVALS = [
     "$tinterval", "$interval", "$__interval", "$__rate_interval",
-    "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window", "$group_by"
+    "$groupByTime", "$timeWindow", "$groupbytime", "$groupBy", "$window", "$group_by",
+    "$Resolution"
 ]
 
 # When metrics type is histogram we usually need to use histgram_* functions. It's not easy to 
