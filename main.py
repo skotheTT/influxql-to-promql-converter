@@ -117,6 +117,10 @@ def construct_datasource_mapping() -> Optional[Dict[str, str]]:
         mapping = {}
         for influx_name, influx_uid in influx_entries.items():
             for mimir_name, mimir_uid in mimir_entries.items():
+                if influx_name.endswith("frontend_client"):
+                    # This is a custom case which cobalt mimir DS uid for frontend_client
+                    mapping[influx_uid] = "qq8l5-tSz"
+
                 if mimir_name.endswith(influx_name.split(" ")[-1]):  # Compare suffixes
                     mapping[influx_uid] = mimir_uid
 
