@@ -642,6 +642,7 @@ class InfluxQLToM3DashboardConverter:
                 # Non-quoted value variant is terminated either by whitespace or closing parenthesis
                 regex = r'(\w+?|"\S+?")\s*{}\s*([^\s\'~].*?)(?:\)|\s)'.format(operator)
                 for (key, value) in re.findall(regex, query):
+                    LOG.info(f"key = {key} value = {value}")
                     key = key.replace("::tag", "").lstrip('"').rstrip('"')
                     if key == field_name:
                         continue
