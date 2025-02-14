@@ -505,6 +505,7 @@ class InfluxQLToM3DashboardConverter:
                                 expr = f"histogram_sum({expr})"
                             if orig_aggregation == "count":
                                 expr = f"histogram_count({expr})"
+                            break
                 expr += "{modifications}".format(modifications=" ".join(modifications))
 
             expressions.append(expr.replace("'", "'"))
