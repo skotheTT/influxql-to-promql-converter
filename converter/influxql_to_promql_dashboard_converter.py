@@ -514,7 +514,7 @@ class InfluxQLToM3DashboardConverter:
 
     def get_metric_name(self, query: str) -> Tuple[str, str]:
         # udpated_query = query.replace("-", "_")
-        part1 = re.search(r'from "(\S+)" where', query, re.IGNORECASE)
+        part1 = re.search(r'from\s+"(\S+)"\s+where', query, re.IGNORECASE)
         if part1 is None:
             raise ValueError(f"Unable to find metric name in {query}")
         # Added |. after word selection for specific dashboard with a . in the metric name

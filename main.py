@@ -28,6 +28,7 @@ def create_class_name(module: str, module_type: str) -> str:
 
 def is_influx_dashboard(dashboard_item):
     expr_exists = False  # promql dashboard will have an expr element in targets
+    raw_query_exists = False # influxdb dashboard will have a query element in targets
     try:
         for panel in dashboard_item['panels']:
             if panel.get('targets'):
@@ -36,6 +37,8 @@ def is_influx_dashboard(dashboard_item):
                         return True
                     elif target.get('expr'):
                         expr_exists = True
+                    elif target.get('query') and target.get('rawQuery'):
+                        raw_query_exists = True
             if panel.get('panels'):
                 for inner_panel in panel['panels']:
                     if inner_panel.get('targets'):
@@ -44,10 +47,12 @@ def is_influx_dashboard(dashboard_item):
                                 return True
                             elif target.get('expr'):
                                 expr_exists = True
+                            elif target.get('query') and target.get('rawQuery'):
+                                raw_query_exists = True
     except KeyError:
         logger.warning(f"Dashboard {dashboard_item['title']} is not a valid influxdb dashboard, skipping.")
         return False
-    return expr_exists
+    return expr_exists or raw_query_exists
 
 def run():
     start_time = time.time()
